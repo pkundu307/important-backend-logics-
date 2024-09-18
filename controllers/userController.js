@@ -1,25 +1,35 @@
-import User from "../models/userSchema.js";
-import bcrypt from "bcrypt"
-const saltRounds = 10;
+import bcrypt from 'bcrypt';
+import User from '../models/userSchema.js'; // Import the User model
+const saltRounds = 10; // Adjust salt rounds as needed
 
-export const createUser=async(req,res)=>{
-  
+export const createUser = async (req, res) => {
     try {
-        const {email,password}=req.body;
-        const hashedPasswrd =await bcrypt.hash(password,saltRounds)//encrypted password
-        //bcrypt uses few factors to generate hashedPasswords 1. time ,region , connection setup
-        const user = new User({email:email,password:hashedPasswrd});//by default mongodb will
-        //provide an unique userId to every user
+        const { email, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, saltRounds); // Encrypt password
+        const user = new User({ email: email, password: hashedPassword }); // MongoDB will provide a unique userId to every user
         await user.save();
         res.status(201).json(user);
     } catch (error) {
         console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
+};
 
+export const login = async (req,res)=>{
+    try{
+        const {email,password} = req.body;
+        const user = await User.findOne({email:email})
+        if(!user){
+            return res.status(404).json({message: 'User not found'})
+        }
+        // const isMatch = (user.password === password)//when password is not encrypted
+        const isMatch = await bcrypt.compare(password, user.password)//when password is encrypted using bcrypt
+                                            //$2b$10$3ujIsvcW.LaD
+        if(!isMatch){
+            return res.status(401).json({message: 'Invalid details'})
+        }
+        res.status(200).json({message:'user ok',user})
+    }catch (error) {
+    console.error(error);
+    }
 }
-
-
-// decrypt is not possible with bcrypt 
-// we again enctrypt the password and then compare it against with stored one from the database
-// abc123 -> def456(stored in database)
-// abc123 -> def456 (compare this with stored one from database)
