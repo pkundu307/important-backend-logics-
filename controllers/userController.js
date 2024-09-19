@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import User from '../models/userSchema.js'; // Import the User model
 const saltRounds = 10; // Adjust salt rounds as needed
+const JWT_SECRET="PRASANNA"
 
 export const createUser = async (req, res) => {
     try {
@@ -28,7 +30,9 @@ export const login = async (req,res)=>{
         if(!isMatch){
             return res.status(401).json({message: 'Invalid details'})
         }
-        res.status(200).json({message:'user ok',user})
+        const token = jwt.sign({userId:user._id},JWT_SECRET,{expiresIn:'1h'})//to decode this token 
+        //I have to create a middleware
+        res.status(200).json({message:'user ok',user,token})
     }catch (error) {
     console.error(error);
     }
