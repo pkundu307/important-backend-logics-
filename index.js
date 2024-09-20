@@ -1,9 +1,11 @@
 import express from 'express';
 import userRouter from "./router/userRouter.js"
 import mongoose from 'mongoose';
+import cors from 'cors';
 const server = express();
 server.use(express.json())
-
+server.use(cors())
+server.use(express.json());
 async function connectDatabase() {
     await mongoose.connect('mongodb://localhost:27017/auth')
     console.log('database connected');

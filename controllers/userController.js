@@ -37,3 +37,10 @@ export const login = async (req,res)=>{
     console.error(error);
     }
 }
+
+
+// router.get('/profile',authenticateTokenDecode,async(req,res)=>{
+//     console.log(req.user.userId);
+//     const WholeUser =await User.findById(req.user.userId);
+//     res.status(200).json({user:WholeUser});
+// })
