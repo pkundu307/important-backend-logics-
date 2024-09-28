@@ -11,9 +11,9 @@ const from = process.env.mail;
 export const createUser = async (req, res) => {
     try {
         const { email, password } = req.body;
-        // const hashedPassword = await bcrypt.hash(password, saltRounds); // Encrypt password
-        // const user = new User({ email: email, password: hashedPassword }); // MongoDB will provide a unique userId to every user
-        // await user.save();
+         const hashedPassword = await bcrypt.hash(password, saltRounds); // Encrypt password
+         const user = new User({ email: email, password: hashedPassword }); // MongoDB will provide a unique userId to every user
+         await user.save();
         console.log(from);
         
         const transporter =await nodemailer.createTransport({
