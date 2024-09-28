@@ -1,16 +1,40 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
 import User from '../models/userSchema.js'; // Import the User model
 const saltRounds = 10; // Adjust salt rounds as needed
 const JWT_SECRET="PRASANNA"
+dotenv.config();
+const from = process.env.mail;
 
 export const createUser = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, saltRounds); // Encrypt password
-        const user = new User({ email: email, password: hashedPassword }); // MongoDB will provide a unique userId to every user
-        await user.save();
-        res.status(201).json(user);
+        // const hashedPassword = await bcrypt.hash(password, saltRounds); // Encrypt password
+        // const user = new User({ email: email, password: hashedPassword }); // MongoDB will provide a unique userId to every user
+        // await user.save();
+        console.log(from);
+        
+        const transporter =await nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.mail,
+                pass: process.env.maillpassword
+            }
+        })
+        
+        const mail=await transporter.sendMail({
+            from: from,
+            to: email,
+            subject: 'Welcome to Our Website!',
+            text: 'Thank you for joining our website. Your account has been created successfully.',
+            html: `<h1>Welcome to Our Website!</h1><p>Thank you for joining our website. Your account has been created successfully.</p>` 
+        })
+        console.log('mail sent',mail.messageId);
+        
+
+        res.status(201).json();
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
